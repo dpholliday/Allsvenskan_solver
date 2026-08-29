@@ -5,6 +5,10 @@ from pathlib import Path
 import pandas as pd
 
 
+def selected_squad(plan, gw):
+    return plan[(plan["week"] == gw) & (plan["squad"] == 1)]
+
+
 def read_sensitivity(options=None):
     directory = "./data/results"
 
@@ -209,27 +213,28 @@ def read_sensitivity(options=None):
             no_plans = 0
             for filename in Path(directory).glob("*.csv"):
                 plan = pd.read_csv(filename)
+                gw_squad = selected_squad(plan, gw)
                 # Goalkeepers list of tuples (name, lineup status)
                 goalkeepers += (
-                    plan[(plan["week"] == gw) & (plan["pos"] == "GKP") & (plan["transfer_out"] != 1)][["name", "lineup"]]
+                    gw_squad[gw_squad["pos"] == "GKP"][["name", "lineup"]]
                     .apply(lambda x: (x["name"], 1 if x["lineup"] == 1 else 0), axis=1)
                     .to_list()
                 )
                 # Defenders list of tuples (name, lineup status)
                 defenders += (
-                    plan[(plan["week"] == gw) & (plan["pos"] == "DEF") & (plan["transfer_out"] != 1)][["name", "lineup"]]
+                    gw_squad[gw_squad["pos"] == "DEF"][["name", "lineup"]]
                     .apply(lambda x: (x["name"], 1 if x["lineup"] == 1 else 0), axis=1)
                     .to_list()
                 )
                 # Midfielders list of tuples (name, lineup status)
                 midfielders += (
-                    plan[(plan["week"] == gw) & (plan["pos"] == "MID") & (plan["transfer_out"] != 1)][["name", "lineup"]]
+                    gw_squad[gw_squad["pos"] == "MID"][["name", "lineup"]]
                     .apply(lambda x: (x["name"], 1 if x["lineup"] == 1 else 0), axis=1)
                     .to_list()
                 )
                 # Forwards list of tuples (name, lineup status)
                 forwards += (
-                    plan[(plan["week"] == gw) & (plan["pos"] == "FWD") & (plan["transfer_out"] != 1)][["name", "lineup"]]
+                    gw_squad[gw_squad["pos"] == "FWD"][["name", "lineup"]]
                     .apply(lambda x: (x["name"], 1 if x["lineup"] == 1 else 0), axis=1)
                     .to_list()
                 )
